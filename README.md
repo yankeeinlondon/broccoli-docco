@@ -1,18 +1,20 @@
 #broccoli-docco
 *Broccoli plugin for generating code documentation*
 
+> NOTE: this is still a WIP, please not for use just yet :)
+
 ## Overview
 This plugin leverages the popular [docco](http://jashkenas.github.io/docco/) documentation generator. This plugin can be used in your `brocfile.js` to identify tree's which should be documented. The primary method that will be exposed on this class is the `document` function:
 
-	function document(inputTree, outputTarget, options) {  }
+	function document(inputTree, options) {  }
 
 
 Usage would look something like:
 
 	var docco = require('broccoli-docco').DoccoBroc;
-	docco.document('src','docs');
+	docco.document('src');
 	
-In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory. In this example we simply put in a string representations of the source tree which is fine for single-homed tree's but there's nothing preventing you from targetting multiple homes.
+In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory (the default location). In this example we simply put in a string representations of the source tree which is fine for single-homed tree's but there's nothing preventing you from targetting multiple homes.
 
 ## Configuration
 Docco provides configuration via an `options` hash which you have access to on the **document** function which proxies this hash as an offset to it's own **options** hash: 
