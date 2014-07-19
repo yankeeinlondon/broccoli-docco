@@ -1,0 +1,24 @@
+{
+  "name": "broccoli-docco",
+  "version": "0.0.0",
+  "description": "A broccoli plugin that generates HTML code documentation using the popular [docco](http://jashkenas.github.io/docco/) library.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ksnyde/broccoli-docco.git"
+  },
+  "keywords": [
+    "broccoli",
+    "broccoli-plugin"
+  ],
+  "author": "Ken Snyder <ken@ken.net> (http://ken.net/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ksnyde/broccoli-docco/issues"
+  },
+  "homepage": "https://github.com/ksnyde/broccoli-docco"
+}
+
