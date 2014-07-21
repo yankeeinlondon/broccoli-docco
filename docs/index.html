@@ -11,6 +11,32 @@
   <div id="container">
     <div id="background"></div>
     
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="Brocfile.html">
+                Brocfile.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="test.html">
+                test.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
     <ul class="sections">
         
         
@@ -22,13 +48,15 @@
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
               <h1 id="broccoli-docco-plugin">broccoli-docco plugin</h1>
-<p><em>Auto-generate documentation for your code leveraging the Broccoli build pipeline and the Docco documentation generator</em></p>
+<blockquote>
+<p>a subclass of <a href="https://github.com/broccolijs/broccoli-filter">broccoli-filter</a> </p>
+</blockquote>
+<p><em>Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the Docco documentation generator</em></p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> 
-	brocWriter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-writer'</span>),
-	rsvp = <span class="hljs-built_in">require</span>(<span class="hljs-string">'rsvp'</span>),
+	Filter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-filter'</span>),
 	docco = <span class="hljs-built_in">require</span>(<span class="hljs-string">'docco'</span>);</pre></div></div>
             
         </li>
@@ -44,11 +72,12 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> DoccoBroc = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">Docco</span><span class="hljs-params">()</span> </span>{
-  <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Docco)) {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Docco();
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">DoccoFilter</span><span class="hljs-params">(inputTree, options)</span> </span>{
+  <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> DoccoFilter)) {
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DoccoFilter(inputTree, options);
   }
-  <span class="hljs-keyword">this</span>.inTree = inTree;
+  
+  <span class="hljs-keyword">this</span>.inputTree = inputTree;
   <span class="hljs-keyword">this</span>.options = options || {};
 };</pre></div></div>
             
@@ -61,13 +90,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Extends the <code>broccoli-writer</code> class</p>
+              <p>Extends the <code>broccoli-filter</code> class</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype = <span class="hljs-built_in">Object</span>.create(brocWriter.prototype);
-DoccoBroc.prototype.constructor = DoccoBroc;
-DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation generator'</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype = <span class="hljs-built_in">Object</span>.create(Filter.prototype);
+DoccoBroc.prototype.constructor = DoccoFilter;
+DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation generator using broccoli build pipeline'</span>;</pre></div></div>
             
         </li>
         
@@ -82,7 +111,7 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>modules.exports = DoccoBroc;</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = DoccoFilter;</pre></div></div>
             
         </li>
         
@@ -106,8 +135,11 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype.document = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(inputTree, options)</span> </span>{
-  <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype.processString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(str, relativePath)</span> </span>{
+	docco.document
+	
+
+};</pre></div></div>
             
         </li>
         
@@ -117,62 +149,6 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
-              </div>
-              <p>Return a promise to a promise</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">return</span> inputTree(<span class="hljs-keyword">this</span>.inTree).then(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(srcDir)</span> </span>{	
-	  <span class="hljs-keyword">var</span> promise = <span class="hljs-keyword">new</span> rsvp.Promise(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(resolvePromise, rejectPromise)</span> </span>{</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-7">&#182;</a>
-              </div>
-              <p>Proxy to Docco</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>		  docco.document(options.docco, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,data)</span> </span>{
-			  <span class="hljs-keyword">if</span> (err) {
-				  rejectPromise(err);
-			  }
-			  <span class="hljs-keyword">else</span> {
-				  resolvePromise(data);
-			  }	
-		  });
-	  });</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
-              </div>
-              <p>Return Docco promise</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>	  <span class="hljs-keyword">return</span> promise;
-  });
-};</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>end <em>write</em></p>
 
