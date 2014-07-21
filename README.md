@@ -5,8 +5,11 @@
 
 ## Installation ##
 
+At the root of your development project type:
+
 ````bash
-npm install --save-dev broccoli-docco
+npm install broccoli-docco --save
+````
 
 ## Overview
 This plugin leverages the popular [docco](http://jashkenas.github.io/docco/) documentation generator. This plugin can be used in your `brocfile.js` to identify tree's which should be documented. The primary method that will be exposed on this class is the `document` function:
@@ -22,7 +25,7 @@ var docco = require('broccoli-docco').DoccoBroc;
 docco.document('src');
 ````
 	
-In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory (the default location). In this example we simply put in a string representations of the source tree which is fine for single-homed tree's but there's nothing preventing you from targetting multiple homes.
+In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory (the default location). 
 
 
 ## Options
