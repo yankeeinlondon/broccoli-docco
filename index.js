@@ -18,7 +18,7 @@ DoccoBroc.prototype = Object.create(brocWriter.prototype);
 DoccoBroc.prototype.constructor = DoccoBroc;
 DoccoBroc.prototype.description = 'docco documentation generator';
 // Modules Export
-modules.exports = DoccoBroc;
+module.exports = DoccoBroc;
 
 // ## document ##
 // Parameters:
