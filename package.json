@@ -1,6 +1,6 @@
 {
   "name": "broccoli-docco",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A broccoli plugin that generates HTML code documentation using the popular [docco](http://jashkenas.github.io/docco/) library.",
   "main": "index.js",
   "scripts": {
