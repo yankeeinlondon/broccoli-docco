@@ -77,42 +77,52 @@ function getFiles(dir,files_) {
 // extending the broccoli-writer's required `write` method
 DoccoWriter.prototype.write = function(readTree, options) {
 	'use strict';
+	var self = this;
 	debug('Tree: ', readTree);
 	debug('Options:', options);
 	// wait for event/file change and then respond
 	return readTree(this.inputTree).then(function (srcDir) {
-		// make sure Broccoli waits for the promise to be fulfilled
+		// return a promise to Broccoli so that it waits for the async processes to complete 
 		return new RSVP.Promise(function(resolve,reject) {
 			debug('Operating directory: ' + path.resolve('.'));
 			debug('Source directory: ' + srcDir);
 			// get all files in the temporary directories/subdirectories
 			// that broccoli has created for us
 			var files = getFiles(srcDir); 
-			// set Docco params
+			// Set Docco params
 			var doccoParams = [
-				'-o', 'temp',
-				'-l', 'parallel'
+				// > **Docco Output**
+				// We are letting Docco directly write to the project's filesystem (most typically to the `/docs` directory)
+				// but we also then send a tree back to Broccoli that represents this output directory ... the tree will contain
+				// both the generated HTML documentation from the Docco command along with any static assets that might exist in
+				// that directory such as images, css, etc.
+				'-o', self.settings.output, 
+				// > **Docco Layout**
+				// setting the layout is a macro design change for the resultant design documentation
+				'-l', self.settings.layout
+			// > **File(s)**
+			// The final input to Docco is an array of files that are to be processed into documentation
 			].concat(files);
 			// spawn a child process of docco (*using local npm install*)
 			debug('Docco parameters:\n', doccoParams);
 			var spawn = require('child_process').spawn;
 			var doccoCmd = spawn('node_modules/.bin/docco', doccoParams);
+			// Listen for docco's completion
 			doccoCmd.on('exit', function(code,signal) {
 				debug('Docco complete: ', code, signal);
-				resolve(fs.readdirSync('temp'));
+				resolve(pickFiles(self.settings.output));
 			});
+			// Consider any error as broken promise
 			doccoCmd.stderr.setEncoding('utf8');
 			doccoCmd.stderr.on('data', function (data) {
-				console.log(data);
-				if (/^execvp\(\)/.test(data)) {
-					debug('Failed to start Docco process.');
-					reject(data);
-				}
+				console.error(data);
+				reject(data);
 			});
+			// Log stdout if debugging is on
+			doccoCmd.stdout.setEncoding('utf8');
 			doccoCmd.stdout.on('data', function (data) {
-				debug('Docco output', data);
+				debug(data);
 			});
-			debug('exiting write function', fs.readdirSync(srcDir));
 		});
 	});
 };

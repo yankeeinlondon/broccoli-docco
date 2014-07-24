@@ -6,7 +6,10 @@ var debug = require('debug')('broccoli:docco:test');
 
 // cleanup after testing
 after(function () {
-	rimraf.sync('tmp'); // the broccoli temporary directory
+	// rimraf.sync('tmp'); // the broccoli temporary directory
+	// remove the directory that `broccoli build` targets
+	rimraf.sync('broc_temp'); 
+	// remove the directory that `docco` targets
 	rimraf.sync('temp'); // the directory that is the target of the unit test
 });
 
