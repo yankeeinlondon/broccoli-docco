@@ -9,14 +9,12 @@ after(function () {
 	// remove the Broccoli temporary directory (in case it hasn't done this itself)
 	rimraf.sync('tmp'); // the broccoli temporary directory
 	// remove the directory that `broccoli build` targets
-	rimraf.sync('broc_temp'); 
-	// remove the directory that `docco` targets
-	rimraf.sync('temp'); // the directory that is the target of the unit test
+	rimraf.sync('temp'); 
 });
 
 // JavaScript
 it('should create documentation for Javascript source', function () {
-	var expected = './temp/testJS.html';
+	var expected = './temp/docs/testJS.html';
 	var actual = fs.readdirSync('temp');
 	assert(fs.existsSync(expected), "JS documentation should exist! Documentation files that did exist included: " + JSON.stringify(actual));
 	var jsDocumentation = fs.readFileSync(expected);
@@ -25,7 +23,7 @@ it('should create documentation for Javascript source', function () {
 
 // Coffeescript
 it('should create documentation for Coffeescript source', function () {
-	var expected = './temp/testCoffee.html';
+	var expected = './temp/docs/testCoffee.html';
 	var actual = fs.readdirSync('temp');
 	assert(fs.existsSync(expected), "Coffee documentation should exist! Documentation files that did exist included: " + JSON.stringify(actual));
 	var coffeeDocumentation = fs.readFileSync(expected);
@@ -34,7 +32,7 @@ it('should create documentation for Coffeescript source', function () {
 
 // PHP
 it('should create documentation for PHP source', function () {
-	var expected = './temp/testPHP.html';
+	var expected = './temp/docs/testPHP.html';
 	var actual = fs.readdirSync('temp');
 	assert(fs.existsSync(expected), "PHP documentation should exist! Documentation files that did exist included: " + JSON.stringify(actual));
 	var phpDocumentation = fs.readFileSync(expected);
