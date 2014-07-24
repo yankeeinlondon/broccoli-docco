@@ -1,48 +1,128 @@
+// ![ ](docco.png)
 // #broccoli-docco plugin
-// > a subclass of [broccoli-filter](https://github.com/broccolijs/broccoli-filter) 
+// > a subclass of [broccoli-writer](https://github.com/broccolijs/broccoli-writer) 
 //
-// *Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the Docco documentation generator*
+// *Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the [Docco](http://jashkenas.github.io/docco/) documentation generator*
 var 
-	Filter = require('broccoli-filter'),
-	chalk = require('chalk'),
+	Writer = require('broccoli-writer'),
+	fs = require('fs'),
+	path = require('path'),
+	pickFiles = require('broccoli-static-compiler'),
 	RSVP = require('rsvp'),
-	docco = require('docco');
+	debug = require('debug')('broccoli:docco');
 
-// Class Prototype
-function DoccoFilter(inputTree, options) {
-  if (!(this instanceof DoccoFilter)) {
-	  console.log('about to instantiate');
-    return new DoccoFilter(inputTree, options);
-  }
-  
-  this.inputTree = inputTree;
-  this.options = options || {};
-  console.log('inputTree is ',inputTree);
-};
-
-// Extends the `broccoli-filter` class
-DoccoFilter.prototype = Object.create(Filter.prototype);
-DoccoFilter.prototype.constructor = DoccoFilter;
-DoccoFilter.prototype.description = 'docco documentation generator using broccoli build pipeline';
-// Modules Export
-module.exports = DoccoFilter;
-
-// ## processString ##
+// ##Class Prototype##
 // Parameters:
 // 
 // - `inputTree` - the input tree that is being processed
 // - `options` - an options hash to configure behaviour, key hash options include:
 //      - `destDir` - the base directory to write the documentation to; defaults to '/docs'
 //      - `docco` - the Docco package provides an options hash which is proxied to this property
-DoccoFilter.prototype.processString = function(str, relativePath) {
-	var self = this;
-	return new RSVP.Promise(function(resolve,reject) {
-		docco.document(str, function(err, data) {
-			if(err) {
-				reject(err);
-			} else {
-				resolve(data);
-			}
+function DoccoWriter(inputTree, options) {
+	'use strict';
+
+	if (!(this instanceof DoccoWriter)) {
+		return new DoccoWriter(inputTree, options);
+	}
+  
+	if (typeof inputTree === 'string') {
+		debug('Input tree is a string, converting to tree');
+		this.inputTree = pickFiles(inputTree, {
+			srcDir: '/',
+			destDir: '/'
 		});
-	}.bind(self));
-}; 
+	} else {
+		this.inputTree = inputTree; // assumed to be a tree object
+	}
+	this.options = options || {};
+	this.settings = {
+		output: options.output || 'docs',
+		layout: options.layout || 'parallel', // built-in are 'parallel','linear', or 'classic'
+	};
+	debug('settings are ', this.settings);
+}
+
+// Extends `broccoli-writer` class
+DoccoWriter.prototype = Object.create(Writer.prototype);
+DoccoWriter.prototype.constructor = DoccoWriter;
+DoccoWriter.prototype.description = 'Docco documentation generator';
+// Modules Export
+module.exports = DoccoWriter;
+
+// ##getFiles##
+// helper function which gets the full path to all files in given directory (and subdirectories)
+function getFiles(dir,files_) {
+	'use strict';
+    files_ = files_ || [];
+    if (typeof files_ === 'undefined') {
+		files_=[];
+	}
+    var files = fs.readdirSync(dir);
+	debug('Processing change; files include: ', files);
+    for(var i in files){
+        if (!files.hasOwnProperty(i)) { 
+			continue;
+		}
+        var name = dir+'/'+files[i];
+        if (fs.statSync(name).isDirectory()){
+            getFiles(name,files_);
+        } else {
+            files_.push(name);
+        }
+    }
+    return files_;
+}
+
+// ## write ##
+// extending the broccoli-writer's required `write` method
+DoccoWriter.prototype.write = function(readTree, options) {
+	'use strict';
+	var self = this;
+	debug('Tree: ', readTree);
+	debug('Options:', options);
+	// wait for event/file change and then respond
+	return readTree(this.inputTree).then(function (srcDir) {
+		// return a promise to Broccoli so that it waits for the async processes to complete 
+		return new RSVP.Promise(function(resolve,reject) {
+			debug('Operating directory: ' + path.resolve('.'));
+			debug('Source directory: ' + srcDir);
+			// get all files in the temporary directories/subdirectories
+			// that broccoli has created for us
+			var files = getFiles(srcDir); 
+			// Set Docco params
+			var doccoParams = [
+				// > **Docco Output**
+				// We are letting Docco directly write to the project's filesystem (most typically to the `/docs` directory)
+				// but we also then send a tree back to Broccoli that represents this output directory ... the tree will contain
+				// both the generated HTML documentation from the Docco command along with any static assets that might exist in
+				// that directory such as images, css, etc.
+				'-o', self.settings.output, 
+				// > **Docco Layout**
+				// setting the layout is a macro design change for the resultant design documentation
+				'-l', self.settings.layout
+			// > **File(s)**
+			// The final input to Docco is an array of files that are to be processed into documentation
+			].concat(files);
+			// spawn a child process of docco (*using local npm install*)
+			debug('Docco parameters:\n', doccoParams);
+			var spawn = require('child_process').spawn;
+			var doccoCmd = spawn('node_modules/.bin/docco', doccoParams);
+			// Listen for docco's completion
+			doccoCmd.on('exit', function(code,signal) {
+				debug('Docco complete: ', code, signal);
+				resolve(pickFiles(self.settings.output));
+			});
+			// Consider any error as broken promise
+			doccoCmd.stderr.setEncoding('utf8');
+			doccoCmd.stderr.on('data', function (data) {
+				console.error(data);
+				reject(data);
+			});
+			// Log stdout if debugging is on
+			doccoCmd.stdout.setEncoding('utf8');
+			doccoCmd.stdout.on('data', function (data) {
+				debug(data);
+			});
+		});
+	});
+};

@@ -1,10 +1,10 @@
 {
   "name": "broccoli-docco",
-  "version": "0.0.2",
-  "description": "A broccoli plugin that generates HTML code documentation using the popular [docco](http://jashkenas.github.io/docco/) library.",
+  "version": "0.0.4",
+  "description": "A [broccoli](https://github.com/broccolijs/broccoli) plugin that generates HTML code documentation using the popular [docco](http://jashkenas.github.io/docco/) library.",
   "main": "index.js",
   "scripts": {
-    "test": "broccoli build temp && mocha"
+    "test": "jshint index.js && broccoli build broc_temp && mocha "
   },
   "repository": {
     "type": "git",
@@ -24,15 +24,17 @@
   },
   "homepage": "https://github.com/ksnyde/broccoli-docco",
   "dependencies": {
-    "broccoli-filter": "^0.1.1",
+    "broccoli-writer": "^0.1.1",
+    "debug": "^1.0.4",
     "docco": "^0.6.3",
+    "chalk": "^0.5.1",
     "rsvp": "^3.0.9"
   },
   "devDependencies": {
     "broccoli": "^0.12.3",
     "broccoli-static-compiler": "^0.1.4",
     "chai": "^1.9.1",
-    "chalk": "^0.5.1",
+    "jshint": "^2.5.2",
     "mocha": "^1.20.1",
     "rimraf": "^2.2.8"
   }
