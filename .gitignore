@@ -2,3 +2,4 @@ node_modules/*
 temp/*
 tmp/*
 broc_temp/*
+npm-debug.log
