@@ -9,6 +9,7 @@ var
 	path = require('path'),
 	pickFiles = require('broccoli-static-compiler'),
 	RSVP = require('rsvp'),
+	spawn = require('child_process').spawn,
 	debug = require('debug')('broccoli:docco');
 
 // ##Class Prototype##
@@ -34,11 +35,12 @@ function DoccoWriter(inputTree, options) {
 	} else {
 		this.inputTree = inputTree; // assumed to be a tree object
 	}
-	this.options = options || {};
-	this.settings = {
-		output: options.output || 'docs',
-		layout: options.layout || 'parallel', // built-in are 'parallel','linear', or 'classic'
-	};
+	/* TODO: make this defaulting pattern prettier ... must be a common way of doing this in JS-land */
+	options = options || {};
+	this.settings = {};
+	this.settings.output = options.hasOwnProperty('output') ? options.output : 'docs';
+	this.settings.layout = options.hasOwnProperty('layout') ? options.layout : 'parallel'; // built-in are 'parallel','linear', or 'classic'
+	
 	debug('settings are ', this.settings);
 }
 
@@ -75,11 +77,10 @@ function getFiles(dir,files_) {
 
 // ## write ##
 // extending the broccoli-writer's required `write` method
-DoccoWriter.prototype.write = function(readTree, options) {
+DoccoWriter.prototype.write = function(readTree, destDir) {
 	'use strict';
 	var self = this;
-	debug('Tree: ', readTree);
-	debug('Options:', options);
+	debug('Options:', destDir);
 	// wait for event/file change and then respond
 	return readTree(this.inputTree).then(function (srcDir) {
 		// return a promise to Broccoli so that it waits for the async processes to complete 
@@ -92,11 +93,9 @@ DoccoWriter.prototype.write = function(readTree, options) {
 			// Set Docco params
 			var doccoParams = [
 				// > **Docco Output**
-				// We are letting Docco directly write to the project's filesystem (most typically to the `/docs` directory)
-				// but we also then send a tree back to Broccoli that represents this output directory ... the tree will contain
-				// both the generated HTML documentation from the Docco command along with any static assets that might exist in
-				// that directory such as images, css, etc.
-				'-o', self.settings.output, 
+				// Output is all directed to the Broccoli temporary directory which has been given to us
+				// so that it will be available as a tree in the downstream broccoli processing
+				'-o', path.join(destDir, self.settings.output), 
 				// > **Docco Layout**
 				// setting the layout is a macro design change for the resultant design documentation
 				'-l', self.settings.layout
@@ -105,12 +104,10 @@ DoccoWriter.prototype.write = function(readTree, options) {
 			].concat(files);
 			// spawn a child process of docco (*using local npm install*)
 			debug('Docco parameters:\n', doccoParams);
-			var spawn = require('child_process').spawn;
 			var doccoCmd = spawn('node_modules/.bin/docco', doccoParams);
 			// Listen for docco's completion
-			doccoCmd.on('exit', function(code,signal) {
-				debug('Docco complete: ', code, signal);
-				resolve(pickFiles(self.settings.output));
+			doccoCmd.on('exit', function() {
+				resolve();
 			});
 			// Consider any error as broken promise
 			doccoCmd.stderr.setEncoding('utf8');

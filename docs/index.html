@@ -29,11 +29,6 @@
               </a>
             
               
-              <a class="source" href="temp.html">
-                temp.js
-              </a>
-            
-              
               <a class="source" href="test.html">
                 test.js
               </a>
@@ -73,6 +68,7 @@
 	path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>),
 	pickFiles = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-static-compiler'</span>),
 	RSVP = <span class="hljs-built_in">require</span>(<span class="hljs-string">'rsvp'</span>),
+	spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn,
 	debug = <span class="hljs-built_in">require</span>(<span class="hljs-string">'debug'</span>)(<span class="hljs-string">'broccoli:docco'</span>);</pre></div></div>
             
         </li>
@@ -113,11 +109,12 @@
 	} <span class="hljs-keyword">else</span> {
 		<span class="hljs-keyword">this</span>.inputTree = inputTree; <span class="hljs-comment">// assumed to be a tree object</span>
 	}
-	<span class="hljs-keyword">this</span>.options = options || {};
-	<span class="hljs-keyword">this</span>.settings = {
-		output: options.output || <span class="hljs-string">'docs'</span>,
-		layout: options.layout || <span class="hljs-string">'parallel'</span>, <span class="hljs-comment">// built-in are 'parallel','linear', or 'classic'</span>
-	};
+	<span class="hljs-comment">/* TODO: make this defaulting pattern prettier ... must be a common way of doing this in JS-land */</span>
+	options = options || {};
+	<span class="hljs-keyword">this</span>.settings = {};
+	<span class="hljs-keyword">this</span>.settings.output = options.hasOwnProperty(<span class="hljs-string">'output'</span>) ? options.output : <span class="hljs-string">'docs'</span>;
+	<span class="hljs-keyword">this</span>.settings.layout = options.hasOwnProperty(<span class="hljs-string">'layout'</span>) ? options.layout : <span class="hljs-string">'parallel'</span>; <span class="hljs-comment">// built-in are 'parallel','linear', or 'classic'</span>
+	
 	debug(<span class="hljs-string">'settings are '</span>, <span class="hljs-keyword">this</span>.settings);
 }</pre></div></div>
             
@@ -203,11 +200,10 @@ DoccoWriter.prototype.description = <span class="hljs-string">'Docco documentati
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>DoccoWriter.prototype.write = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(readTree, options)</span> </span>{
+            <div class="content"><div class='highlight'><pre>DoccoWriter.prototype.write = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(readTree, destDir)</span> </span>{
 <span class="hljs-pi">	'use strict'</span>;
 	<span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
-	debug(<span class="hljs-string">'Tree: '</span>, readTree);
-	debug(<span class="hljs-string">'Options:'</span>, options);</pre></div></div>
+	debug(<span class="hljs-string">'Options:'</span>, destDir);</pre></div></div>
             
         </li>
         
@@ -283,15 +279,13 @@ that broccoli has created for us</p>
               </div>
               <blockquote>
 <p><strong>Docco Output</strong>
-We are letting Docco directly write to the project’s filesystem (most typically to the <code>/docs</code> directory)
-but we also then send a tree back to Broccoli that represents this output directory … the tree will contain
-both the generated HTML documentation from the Docco command along with any static assets that might exist in
-that directory such as images, css, etc.</p>
+Output is all directed to the Broccoli temporary directory which has been given to us
+so that it will be available as a tree in the downstream broccoli processing</p>
 </blockquote>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>				<span class="hljs-string">'-o'</span>, self.settings.output,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>				<span class="hljs-string">'-o'</span>, path.join(destDir, self.settings.output),</pre></div></div>
             
         </li>
         
@@ -343,7 +337,6 @@ The final input to Docco is an array of files that are to be processed into docu
             </div>
             
             <div class="content"><div class='highlight'><pre>			debug(<span class="hljs-string">'Docco parameters:\n'</span>, doccoParams);
-			<span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn;
 			<span class="hljs-keyword">var</span> doccoCmd = spawn(<span class="hljs-string">'node_modules/.bin/docco'</span>, doccoParams);</pre></div></div>
             
         </li>
@@ -359,9 +352,8 @@ The final input to Docco is an array of files that are to be processed into docu
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>			doccoCmd.on(<span class="hljs-string">'exit'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(code,signal)</span> </span>{
-				debug(<span class="hljs-string">'Docco complete: '</span>, code, signal);
-				resolve(pickFiles(self.settings.output));
+            <div class="content"><div class='highlight'><pre>			doccoCmd.on(<span class="hljs-string">'exit'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+				resolve();
 			});</pre></div></div>
             
         </li>
@@ -379,11 +371,8 @@ The final input to Docco is an array of files that are to be processed into docu
             
             <div class="content"><div class='highlight'><pre>			doccoCmd.stderr.setEncoding(<span class="hljs-string">'utf8'</span>);
 			doccoCmd.stderr.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
-				<span class="hljs-built_in">console</span>.log(data);
-				<span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^execvp\(\)/</span>.test(data)) {
-					debug(<span class="hljs-string">'Failed to start Docco process.'</span>);
-					reject(data);
-				}
+				<span class="hljs-built_in">console</span>.error(data);
+				reject(data);
 			});</pre></div></div>
             
         </li>
