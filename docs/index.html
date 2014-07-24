@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>broccoli-docco plugin</title>
+  <title>index.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -29,6 +29,16 @@
               </a>
             
               
+              <a class="source" href="*.html">
+                *.js
+              </a>
+            
+              
+              <a class="source" href="temp.html">
+                temp.js
+              </a>
+            
+              
               <a class="source" href="test.html">
                 test.js
               </a>
@@ -39,6 +49,12 @@
     
     <ul class="sections">
         
+          <li id="title">
+              <div class="annotation">
+                  <h1>index.js</h1>
+              </div>
+          </li>
+        
         
         
         <li id="section-1">
@@ -47,17 +63,21 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h1 id="broccoli-docco-plugin">broccoli-docco plugin</h1>
+              <p><img src="docco.png" alt=" "></p>
+<h1 id="broccoli-docco-plugin">broccoli-docco plugin</h1>
 <blockquote>
-<p>a subclass of <a href="https://github.com/broccolijs/broccoli-filter">broccoli-filter</a> </p>
+<p>a subclass of <a href="https://github.com/broccolijs/broccoli-writer">broccoli-writer</a> </p>
 </blockquote>
-<p><em>Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the Docco documentation generator</em></p>
+<p><em>Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the <a href="http://jashkenas.github.io/docco/">Docco</a> documentation generator</em></p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> 
-	Filter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-filter'</span>),
-	docco = <span class="hljs-built_in">require</span>(<span class="hljs-string">'docco'</span>);</pre></div></div>
+	Writer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-writer'</span>),
+	fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>),
+	path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>),
+	pickFiles = <span class="hljs-built_in">require</span>(<span class="hljs-string">'broccoli-static-compiler'</span>),
+	debug = <span class="hljs-built_in">require</span>(<span class="hljs-string">'debug'</span>)(<span class="hljs-string">'broccoli:docco'</span>);</pre></div></div>
             
         </li>
         
@@ -68,18 +88,42 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>Class Prototype</p>
+              <h2 id="class-prototype">Class Prototype</h2>
+<p>Parameters:</p>
+<ul>
+<li><code>inputTree</code> - the input tree that is being processed</li>
+<li><code>options</code> - an options hash to configure behaviour, key hash options include:<ul>
+<li><code>destDir</code> - the base directory to write the documentation to; defaults to ‘/docs’</li>
+<li><code>docco</code> - the Docco package provides an options hash which is proxied to this property</li>
+</ul>
+</li>
+</ul>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">DoccoFilter</span><span class="hljs-params">(inputTree, options)</span> </span>{
-  <span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> DoccoFilter)) {
-    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DoccoFilter(inputTree, options);
-  }
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">DoccoWriter</span><span class="hljs-params">(inputTree, options)</span> </span>{
+<span class="hljs-pi">	'use strict'</span>;
+
+	<span class="hljs-keyword">if</span> (!(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> DoccoWriter)) {
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> DoccoWriter(inputTree, options);
+	}
   
-  <span class="hljs-keyword">this</span>.inputTree = inputTree;
-  <span class="hljs-keyword">this</span>.options = options || {};
-};</pre></div></div>
+	<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> inputTree === <span class="hljs-string">'string'</span>) {
+		debug(<span class="hljs-string">'Input tree is a string, converting to tree'</span>);
+		<span class="hljs-keyword">this</span>.inputTree = pickFiles(inputTree, {
+			srcDir: <span class="hljs-string">'/'</span>,
+			destDir: <span class="hljs-string">'/'</span>
+		});
+	} <span class="hljs-keyword">else</span> {
+		<span class="hljs-keyword">this</span>.inputTree = inputTree; <span class="hljs-comment">// assumed to be a tree object</span>
+	}
+	<span class="hljs-keyword">this</span>.options = options || {};
+	<span class="hljs-keyword">this</span>.settings = {
+		output: options.output || <span class="hljs-string">'docs'</span>,
+		layout: options.layout || <span class="hljs-string">'parallel'</span>, <span class="hljs-comment">// built-in are 'parallel','linear', or 'classic'</span>
+	};
+	debug(<span class="hljs-string">'settings are '</span>, <span class="hljs-keyword">this</span>.settings);
+}</pre></div></div>
             
         </li>
         
@@ -90,13 +134,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Extends the <code>broccoli-filter</code> class</p>
+              <p>Extends <code>broccoli-writer</code> class</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype = <span class="hljs-built_in">Object</span>.create(Filter.prototype);
-DoccoBroc.prototype.constructor = DoccoFilter;
-DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation generator using broccoli build pipeline'</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>DoccoWriter.prototype = <span class="hljs-built_in">Object</span>.create(Writer.prototype);
+DoccoWriter.prototype.constructor = DoccoWriter;
+DoccoWriter.prototype.description = <span class="hljs-string">'Docco documentation generator'</span>;</pre></div></div>
             
         </li>
         
@@ -111,7 +155,7 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = DoccoFilter;</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">module</span>.exports = DoccoWriter;</pre></div></div>
             
         </li>
         
@@ -122,24 +166,32 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <h2 id="document">document</h2>
-<p>Parameters:</p>
-<ul>
-<li><code>inputTree</code> - the input tree that is being processed</li>
-<li><code>options</code> - an options hash to configure behaviour, key hash options include:<ul>
-<li><code>destDir</code> - the base directory to write the documentation to; defaults to ‘/docs’</li>
-<li><code>docco</code> - the Docco package provides an options hash which is proxied to this property</li>
-</ul>
-</li>
-</ul>
+              <h2 id="getfiles">getFiles</h2>
+<p>helper function which gets the full path to all files in given directory (and subdirectories)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>DoccoBroc.prototype.processString = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(str, relativePath)</span> </span>{
-	docco.document
-	
-
-};</pre></div></div>
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getFiles</span><span class="hljs-params">(dir,files_)</span> </span>{
+<span class="hljs-pi">	'use strict'</span>;
+    files_ = files_ || [];
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> files_ === <span class="hljs-string">'undefined'</span>) {
+		files_=[];
+	}
+    <span class="hljs-keyword">var</span> files = fs.readdirSync(dir);
+	debug(<span class="hljs-string">'Processing change; files include: '</span>, files);
+    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i <span class="hljs-keyword">in</span> files){
+        <span class="hljs-keyword">if</span> (!files.hasOwnProperty(i)) { 
+			<span class="hljs-keyword">continue</span>;
+		}
+        <span class="hljs-keyword">var</span> name = dir+<span class="hljs-string">'/'</span>+files[i];
+        <span class="hljs-keyword">if</span> (fs.statSync(name).isDirectory()){
+            getFiles(name,files_);
+        } <span class="hljs-keyword">else</span> {
+            files_.push(name);
+        }
+    }
+    <span class="hljs-keyword">return</span> files_;
+}</pre></div></div>
             
         </li>
         
@@ -150,9 +202,117 @@ DoccoBroc.prototype.description = <span class="hljs-string">'docco documentation
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>end <em>write</em></p>
+              <h2 id="write">write</h2>
+<p>extending the broccoli-writer’s required <code>write</code> method</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>DoccoWriter.prototype.write = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(readTree, options)</span> </span>{
+<span class="hljs-pi">	'use strict'</span>;
+	<span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>wait for change then respond</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">return</span> readTree(<span class="hljs-keyword">this</span>.inputTree).then(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(srcDir)</span> </span>{
+		debug(<span class="hljs-string">'Operating directory: '</span> + path.resolve(<span class="hljs-string">'.'</span>));
+		debug(<span class="hljs-string">'Source directory: '</span> + srcDir);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>get all files in the temporary directories/subdirectories
+that broccoli has created for us</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">var</span> files = getFiles(srcDir);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>set Docco params</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">var</span> doccoParams = [
+			<span class="hljs-string">'-o'</span>, <span class="hljs-string">'temp'</span>,
+			<span class="hljs-string">'-l'</span>, <span class="hljs-string">'parallel'</span>
+		].concat(files);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>spawn a child process of docco (<em>using local npm install</em>)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		debug(<span class="hljs-string">'Docco parameters:\n'</span>, doccoParams);
+		<span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn;
+		<span class="hljs-keyword">var</span> doccoCmd = spawn(<span class="hljs-string">'node_modules/.bin/docco'</span>, doccoParams);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>the ‘exit’ event is NOT FIRING!</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		doccoCmd.on(<span class="hljs-string">'exit'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(code,signal)</span> </span>{
+			debug(<span class="hljs-string">'Docco complete: '</span>, code, signal);
+		});
+		doccoCmd.stderr.setEncoding(<span class="hljs-string">'utf8'</span>);
+		doccoCmd.stderr.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
+			<span class="hljs-built_in">console</span>.log(data);
+			<span class="hljs-keyword">if</span> (<span class="hljs-regexp">/^execvp\(\)/</span>.test(data)) {
+				debug(<span class="hljs-string">'Failed to start Docco process.'</span>);
+			}
+		});
+
+		doccoCmd.stdout.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
+			debug(<span class="hljs-string">'Docco output'</span>, data);
+		});
+		setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			debug(<span class="hljs-string">'waiting ...'</span>);
+		}, <span class="hljs-number">5000</span>);
+		debug(<span class="hljs-string">'exiting write function'</span>, fs.readdirSync(srcDir));
+		<span class="hljs-keyword">return</span> fs.readdirSync(srcDir);
+	});
+};</pre></div></div>
             
         </li>
         

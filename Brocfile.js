@@ -1,14 +1,9 @@
 'use strict';
-var docco = require('./index.js');
-var rsvp = require('rsvp');
-var pickFiles = require('broccoli-static-compiler');
+// ![ ](broccoli.png)
+// ##Brocfile##
+// this `Brocfile` is used by the *broccoli-docco* unit tests
 
-var target = pickFiles('fixtures',{
-	srcDir: '/',
-	files: ['*.js'],
-	destDir: '/'
-});
-console.log("target", target);
-var documents = docco(target);
+var docco = require('./index.js');
+var documents = docco('fixtures', { output: "temp" });
 
 module.exports = documents;

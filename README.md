@@ -18,7 +18,7 @@ This plugin leverages the popular [docco](http://jashkenas.github.io/docco/) doc
 function document(inputTree, options) {  }
 ````
 
-Usage would look something like:
+Usage in the Brocfile would look something like:
 
 ````js
 var docco = require('broccoli-docco').DoccoBroc;
@@ -44,7 +44,7 @@ For more information about options parameteres refer to the [Docco documentation
 ## Code Documentation
 It would be odd to write code that documents code and then *not* document it ... so if you want to see the resultant documented code you can find it here:
 
-> [broccoli-docco](docs/index.html)
+> [broccoli-docco](http://htmlpreview.github.io/?https://github.com/ksnyde/broccoli-docco/blob/master/docs/index.html)
 
 ----
 Happy trails,
