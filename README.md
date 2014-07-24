@@ -1,8 +1,6 @@
 #broccoli-docco
 *[Broccoli](https://github.com/joliss/broccoli) plugin for generating code documentation using [Docco](https://github.com/joliss/broccoli) styled documentation blocks*
 
-> NOTE: this is still a WIP, please not for use just yet :)
-
 ## Installation ##
 
 At the root of your development project type:
@@ -11,35 +9,22 @@ At the root of your development project type:
 npm install broccoli-docco --save
 ````
 
-## Overview
-This plugin leverages the popular [docco](http://jashkenas.github.io/docco/) documentation generator. This plugin can be used in your `brocfile.js` to identify tree's which should be documented. The primary method that will be exposed on this class is the `document` function:
-
-````js
-function document(inputTree, options) {  }
-````
-
+## Usage
+This plugin leverages the popular [Docco](http://jashkenas.github.io/docco/) documentation generator. This plugin can be used in your `brocfile.js` to identify tree's which should be documented. 
 Usage in the Brocfile would look something like:
 
 ````js
-var docco = require('broccoli-docco').DoccoBroc;
-docco.document('src');
+var docco = require('broccoli-docco');
+docco.document('src', {
+	output: 'docs', // this is the default value
+	layout: 'parallel' // this is default value, values could also be 'linear' or 'classic'
+});
 ````
-	
-In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory (the default location). 
 
+In the example above this would look for all supported document types in the `src` directory and create documentation in the `docs` directory using the "parallel" design layout. 
 
-## Options
-**broccoli-docco**'s document method proxies the `options` hash to Docco. So you might have something like:
-
-	var docco = require('broccoli-docco').DoccoBroc;
-	var doccoOptions = {
-		layout: 'parallel',
-		output: 'docs',
-		css: 'myCustomCSS.css'
-	};
-	docco.document('src', doccoOptions);
-	
-For more information about options parameteres refer to the [Docco documentation](http://jashkenas.github.io/docco/). 
+> **Note**: as of this release we are allowing Docco to generate the documentation directory (which is probably a good thing) but we're being a bad plugin by *not* passing a tree back to Broccoli so 
+> no further processing in Broccoli is possible. This will be fixed in a future release (or feel free to send me a PR).
 
 ## Code Documentation
 It would be odd to write code that documents code and then *not* document it ... so if you want to see the resultant documented code you can find it here:

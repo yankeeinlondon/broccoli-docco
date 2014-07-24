@@ -1,6 +1,10 @@
 #Changelog#
 *for **master** branch*
 
+## 0.0.6 ##
+
+- Updated README.md to accurately reflect the current state
+
 ##0.0.5
 - Removed MD URLs from description in package.json
 
