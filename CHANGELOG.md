@@ -1,6 +1,9 @@
 #Changelog#
 *for **master** branch*
 
+##0.0.5
+- Removed MD URLs from description in package.json
+
 ##0.0.4
 - First working version
 - Uses a `spawn` approach to executing **docco** which isn't ideal but it works
