@@ -9,7 +9,7 @@ after(function () {
 	// remove the Broccoli temporary directory (in case it hasn't done this itself)
 	rimraf.sync('tmp'); // the broccoli temporary directory
 	// remove the directory that `broccoli build` targets
-	rimraf.sync('temp'); 
+	rimraf.sync('temp');
 });
 
 // JavaScript
