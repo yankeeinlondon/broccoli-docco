@@ -115,7 +115,9 @@ DoccoWriter.prototype.write = function(readTree, destDir) {
 				console.error(data);
 				if (data.indexOf('unknown type') > -1) {
 					// unknown files are ok, this is not a failure state
+					/* do nothing */
 				} else {
+					// reject all other errors
 					reject(data);					
 				}
 			});
