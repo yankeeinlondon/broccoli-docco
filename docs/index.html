@@ -372,8 +372,7 @@ The final input to Docco is an array of files that are to be processed into docu
             <div class="content"><div class='highlight'><pre>			doccoCmd.stderr.setEncoding(<span class="hljs-string">'utf8'</span>);
 			doccoCmd.stderr.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(data)</span> </span>{
 				<span class="hljs-built_in">console</span>.error(data);
-				reject(data);
-			});</pre></div></div>
+				<span class="hljs-keyword">if</span> (data.indexOf(<span class="hljs-string">'unknown type'</span>) &gt; -<span class="hljs-number">1</span>) {</pre></div></div>
             
         </li>
         
@@ -383,6 +382,24 @@ The final input to Docco is an array of files that are to be processed into docu
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>unknown files are ok, this is not a failure state</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>				} <span class="hljs-keyword">else</span> {
+					reject(data);					
+				}
+			});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Log stdout if debugging is on</p>
 
