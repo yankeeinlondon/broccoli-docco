@@ -1,6 +1,14 @@
 #Changelog#
 *for **master** branch*
 
+## 0.0.9 ##
+
+- `Fix`: Allowed Docco errors associated with unknown file types to be ignored; other errors still will be rejected
+
+## 0.0.8 ##
+
+- `Fix`: uses a proper brocolli pipelining approach; Docco's output is just placed in temp broc directory and passed back to the pipeline
+
 ## 0.0.7 ##
 
 - `Fix`: The compromise of NOT passing back a tree to Broccoli in `0.0.6` was a pretty bad compromise, this release addresses this ... good plugin behavior at last

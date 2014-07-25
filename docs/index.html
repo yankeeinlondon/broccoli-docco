@@ -387,10 +387,8 @@ The final input to Docco is an array of files that are to be processed into docu
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>				} <span class="hljs-keyword">else</span> {
-					reject(data);					
-				}
-			});</pre></div></div>
+            <div class="content"><div class='highlight'><pre>					<span class="hljs-comment">/* do nothing */</span>
+				} <span class="hljs-keyword">else</span> {</pre></div></div>
             
         </li>
         
@@ -400,6 +398,23 @@ The final input to Docco is an array of files that are to be processed into docu
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>reject all other errors</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>					reject(data);					
+				}
+			});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Log stdout if debugging is on</p>
 
