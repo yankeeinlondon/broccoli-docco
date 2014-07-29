@@ -1,5 +1,5 @@
 // ![ ](docco.png)
-// #broccoli-docco plugin
+// #broccoli-docco plugin 
 // > a subclass of [broccoli-writer](https://github.com/broccolijs/broccoli-writer) 
 //
 // *Auto-generate documentation for your code, leveraging the Broccoli build pipeline and the [Docco](http://jashkenas.github.io/docco/) documentation generator*
