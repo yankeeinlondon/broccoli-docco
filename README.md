@@ -1,4 +1,4 @@
-#broccoli-docco
+#broccoli-docco ![ ](https://travis-ci.org/ksnyde/broccoli-docco.svg)
 *[Broccoli](https://github.com/joliss/broccoli) plugin for generating code documentation using [Docco](https://github.com/joliss/broccoli) styled documentation blocks*
 
 ## Installation ##
