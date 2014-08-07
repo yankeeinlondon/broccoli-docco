@@ -104,7 +104,7 @@ DoccoWriter.prototype.write = function(readTree, destDir) {
 			].concat(files);
 			// spawn a child process of docco (*using local npm install*)
 			debug('Docco parameters:\n', doccoParams);
-			var doccoCmd = spawn('node_modules/.bin/docco', doccoParams);
+			var doccoCmd = spawn(path.join(__dirname,'node_modules/.bin/docco'), doccoParams);
 			// Listen for docco's completion
 			doccoCmd.on('exit', function() {
 				resolve();
