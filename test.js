@@ -39,3 +39,29 @@ it('should create documentation for PHP source', function () {
 	assert.notEqual(phpDocumentation,null,"PHP documentation should not be empty");
 });
 
+// Subfolder
+it('should create documentation for source that\'s in a subfolder', function () {
+	var expected = './temp/docs/testSubFolder.html';
+	var actual = fs.readdirSync('temp');
+	assert(fs.existsSync(expected), "JS documentation for a subfolder should exist! Documentation files that did exist included: " + JSON.stringify(actual));
+	var jsDocumentation = fs.readFileSync(expected);
+	assert.notEqual(jsDocumentation,null,"JS documentation should not be empty");
+});
+
+// Brocfile
+it('should create documentation for Brocfile', function () {
+	var expected = './temp/docs/Brocfile.html';
+	var actual = fs.readdirSync('temp');
+	assert(fs.existsSync(expected), "Brocfile documentation should exist! Documentation files that did exist included: " + JSON.stringify(actual));
+	var jsDocumentation = fs.readFileSync(expected);
+	assert.notEqual(jsDocumentation,null,"JS documentation should not be empty");
+});
+
+// No source remenants
+it('none of the source files should exist in the output tree', function () {
+	var expected = './temp/docs/Brocfile.js';
+	var actual = fs.readdirSync('temp');
+	assert.notEqual(fs.existsSync(expected), "Source files should NOT exist in output tree: " + JSON.stringify(actual));
+	expected = './temp/docs/testJS.js';
+	assert.notEqual(fs.existsSync(expected), "Source files should NOT exist in output tree: " + JSON.stringify(actual));
+});

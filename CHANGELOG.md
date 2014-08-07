@@ -1,6 +1,10 @@
 #Changelog#
 *for **master** branch*
 
+## 0.0.11 ##
+
+- `Fix`: Made it so locallized 'docco' module is used; no longer any requirement for parent to include 'docco' as well!
+
 ## 0.0.9 ##
 
 - `Fix`: Allowed Docco errors associated with unknown file types to be ignored; other errors still will be rejected
