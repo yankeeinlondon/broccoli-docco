@@ -1,10 +1,10 @@
 {
   "name": "broccoli-docco",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A broccoli plugin that generates HTML code documentation using the popular docco library.",
   "main": "index.js",
   "scripts": {
-    "test": "jshint index.js && broccoli build temp && mocha "
+    "test": "jshint index.js && broccoli build temp && mocha test.js"
   },
   "repository": {
     "type": "git",

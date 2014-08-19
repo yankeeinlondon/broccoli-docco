@@ -112,7 +112,7 @@ DoccoWriter.prototype.write = function(readTree, destDir) {
 			// Consider any error as broken promise
 			doccoCmd.stderr.setEncoding('utf8');
 			doccoCmd.stderr.on('data', function (data) {
-				console.error(data);
+				debug('Docco stderr: %s', data);
 				if (data.indexOf('unknown type') > -1) {
 					// unknown files are ok, this is not a failure state
 					/* do nothing */

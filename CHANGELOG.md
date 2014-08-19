@@ -1,6 +1,10 @@
 #Changelog#
 *for **master** branch*
 
+## 0.0.12 ##
+
+- `Fix`: Fixed testing bug. Also pushed StdErr reporting to `debug` rather than to console (considering messages were at most warnings).
+
 ## 0.0.11 ##
 
 - `Fix`: Made it so locallized 'docco' module is used; no longer any requirement for parent to include 'docco' as well!
